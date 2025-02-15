@@ -1,0 +1,7 @@
+{
+  "isNotEmpty": "Este campo no puede estar vacío",
+  "isEmail": "Debe ser un correo electrónico válido",
+  "minLength": "Debe tener al menos {min} caracteres",
+  "maxLength": "Debe tener máximo {max} caracteres",
+  "passwordMatch": "Las contraseñas no coinciden"
+}

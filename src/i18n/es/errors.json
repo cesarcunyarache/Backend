@@ -1,0 +1,7 @@
+{
+  "default": "Ha ocurrido un error",
+  "notFound": "Recurso no encontrado",
+  "unauthorized": "No autorizado",
+  "forbidden": "Acceso denegado",
+  "validation": "Error de validación"
+}

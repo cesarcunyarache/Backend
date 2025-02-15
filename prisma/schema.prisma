@@ -1,0 +1,100 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AuthProvider {
+  EMAIL
+  GOOGLE
+  FACEBOOK
+}
+
+
+enum StatusUser {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum VerificationEnum {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+  TWO_FACTOR_AUTH
+}
+
+model User {
+  id              String            @id @default(uuid())
+  name            String?
+  email           String?           @unique
+  password        String?
+  isEmailVerified Boolean           @default(false)
+  provider        AuthProvider @default(EMAIL)
+  socialId        String?
+  refreshToken    String?           @db.Text
+  accessToken     String?           @db.Text
+  expiresAt       Int?
+  photoUrl         String?           @unique
+  roleId          String?
+  status        StatusUser?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  deletedAt       DateTime?
+
+  role              Role?              @relation(fields: [roleId], references: [id], onDelete: SetNull)
+
+  sessions          Session[]
+  userPreferences   UserPreferences?
+  verificationCodes VerificationCode[]
+}
+
+model Role {
+  id    String  @id @default(uuid())
+  name  String?
+  users User[]
+}
+
+
+model Session {
+  id        String    @id @default(uuid())
+  userId    String
+  hash      String
+  userAgent String?
+  expiresAt DateTime
+  
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserPreferences {
+  id                String  @id @default(uuid())
+  enable2FA         Boolean @default(false) // Activado solo si usa email
+  emailNotification Boolean @default(true)
+  twoFactorSecret   String?
+  userId            String  @unique
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationCode {
+  id        String           @id @default(uuid())
+  userId    String
+  code      String           @unique @default(uuid())
+  type      VerificationEnum
+  expiresAt DateTime
+
+  createdAt DateTime @default(now())
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
